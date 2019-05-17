@@ -65,3 +65,9 @@ To test an npm package, use:
 ```
 python api-demo-5d-test-npm-package.py --orgId=<your-org_id> --packageName=<package-name> --packageVersion=<package-version>
 ```
+
+# Ignoring issues
+Use this to sync all ignored issues across all projects
+```
+python api-demo-12-transitive-ignores.py --orgId=<your-org_id>
+```
