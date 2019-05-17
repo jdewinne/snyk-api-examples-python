@@ -11,7 +11,8 @@ def requests_do_post_api_return_json_object(api_url, obj_json_post_body):
     snyk_post_api_headers = snyk_api_headers
     snyk_post_api_headers['Content-type'] = 'application/json'
 
-    resp = requests.post(api_url, json=obj_json_post_body, headers=snyk_api_headers)
+    resp = requests.post(api_url, json=obj_json_post_body,
+                         headers=snyk_api_headers)
     return resp.json()
 
 
@@ -19,7 +20,8 @@ def requests_do_post_api_return_http_response(api_url, obj_json_post_body):
     snyk_post_api_headers = snyk_api_headers
     snyk_post_api_headers['Content-type'] = 'application/json'
 
-    resp = requests.post(api_url, json=obj_json_post_body, headers=snyk_api_headers)
+    resp = requests.post(api_url, json=obj_json_post_body,
+                         headers=snyk_api_headers)
     return resp
 
 
@@ -27,7 +29,8 @@ def requests_do_put_api_return_http_response(api_url, obj_json_post_body):
     snyk_post_api_headers = snyk_api_headers
     snyk_post_api_headers['Content-type'] = 'application/json'
 
-    resp = requests.put(api_url, json=obj_json_post_body, headers=snyk_api_headers)
+    resp = requests.put(api_url, json=obj_json_post_body,
+                        headers=snyk_api_headers)
     return resp
 
 
@@ -107,7 +110,8 @@ def snyk_projects_projects(org_id):
 # Projects -> Delete a Project
 # https://snyk.docs.apiary.io/#reference/projects/individual-project/delete-a-project
 def snyk_projects_delete(org_id, project_id):
-    full_api_url = '%sorg/%s/project/%s' % (snyk_api_base_url, org_id, project_id)
+    full_api_url = '%sorg/%s/project/%s' % (
+        snyk_api_base_url, org_id, project_id)
     resp = requests.delete(full_api_url, headers=snyk_api_headers)
     return resp
     # obj_json_response_content = resp.json()
@@ -118,49 +122,54 @@ def snyk_projects_delete(org_id, project_id):
 # Projects -> List All Issues
 # https://snyk.docs.apiary.io/#reference/projects/project-issues
 # org_id works either like 'demo-applications' or the big hash
-def snyk_projects_project_issues(org_id, project_id):
-    full_api_url = '%sorg/%s/project/%s/issues' % (snyk_api_base_url, org_id, project_id)
-    # print(full_api_url)
-
+def snyk_projects_project_issues(org_id, project_id, ignored=False, patched=False):
+    full_api_url = '%sorg/%s/project/%s/issues' % (
+        snyk_api_base_url, org_id, project_id)
     post_body = {
         'filters': {
             'severities': ['high', 'medium', 'low'],
             'types': ['vuln', 'license'],
-            'ignored': False,
-            'patched': False
+            'ignored': ignored,
+            'patched': patched
         }
     }
 
-    # json_text = json.dumps(post_body, indent=4)
-    # print(json_text)
+    obj_json_response_content = requests_do_post_api_return_json_object(
+        full_api_url, post_body)
 
-    # raw_data = '{ "filters": { "severities": ["high","medium","low"], "types": ["vuln","license"], "ignored": false, "patched": false } }'
-
-    obj_json_response_content = requests_do_post_api_return_json_object(full_api_url, post_body)
-    # print_json_object(obj_json_response_content)
-
-    json_text = json.dumps(obj_json_response_content, indent=4)
-
-    # with open("response.json", "w") as text_file:
-    #     text_file.write(json_text)
-
-    # resp = requests.get(full_api_url, headers=snyk_api_headers)
-
-    # print_json(obj_json_response_content)
     return obj_json_response_content
 
 
 # https://snyk.docs.apiary.io/#reference/projects/project-ignores/list-all-ignores
 def snyk_projects_list_all_ignores(org_id, project_id):
-    full_api_url = '%sorg/%s/project/%s/ignores' % (snyk_api_base_url, org_id, project_id)
+    full_api_url = '%sorg/%s/project/%s/ignores' % (
+        snyk_api_base_url, org_id, project_id)
     resp = requests.get(full_api_url, headers=snyk_api_headers)
     obj_json_response_content = resp.json()
     return obj_json_response_content
 
+# https://snyk.docs.apiary.io/#reference/projects/project-ignores-by-issue/add-ignore
+
+
+def snyk_projects_add_ignore_by_issue(org_id, project_id, issue_id, reasonType, expires):
+    full_api_url = '%sorg/%s/project/%s/ignore/%s' % (
+        snyk_api_base_url, org_id, project_id, issue_id)
+    post_body = {
+        "ignorePath": "*",
+        "reason": "",
+        "reasonType": reasonType,
+        "disregardIfFixable": False,
+        "expires": expires
+    }
+
+    obj_json_response_content = requests_do_post_api_return_http_response(
+        full_api_url, post_body)
+    return obj_json_response_content
 
 
 def snyk_projects_project_jira_issues_list_all_jira_issues(org_id, project_id):
-    full_api_url = '%sorg/%s/project/%s/jira-issues' % (snyk_api_base_url, org_id, project_id)
+    full_api_url = '%sorg/%s/project/%s/jira-issues' % (
+        snyk_api_base_url, org_id, project_id)
     resp = requests.get(full_api_url, headers=snyk_api_headers)
     obj_json_response_content = resp.json()
     # print_json(obj_json_response_content)
@@ -168,14 +177,16 @@ def snyk_projects_project_jira_issues_list_all_jira_issues(org_id, project_id):
 
 
 def snyk_projects_get_product_dependency_graph(org_id, project_id):
-    full_api_url = '%sorg/%s/project/%s/dep-graph' % (snyk_api_base_url, org_id, project_id)
+    full_api_url = '%sorg/%s/project/%s/dep-graph' % (
+        snyk_api_base_url, org_id, project_id)
     resp = requests.get(full_api_url, headers=snyk_api_headers)
     obj_json_response_content = resp.json()
     return obj_json_response_content
 
 
 def snyk_projects_update_project_settings(org_id, project_id, **kwargs):
-    full_api_url = '%sorg/%s/project/%s/settings' % (snyk_api_base_url, org_id, project_id)
+    full_api_url = '%sorg/%s/project/%s/settings' % (
+        snyk_api_base_url, org_id, project_id)
 
     post_body = {}
 
@@ -188,13 +199,15 @@ def snyk_projects_update_project_settings(org_id, project_id, **kwargs):
     if 'pullRequestFailOnlyForHighSeverity' in kwargs:
         post_body['pullRequestFailOnlyForHighSeverity'] = kwargs['pullRequestFailOnlyForHighSeverity']
 
-    http_response = requests_do_put_api_return_http_response(full_api_url, post_body)
+    http_response = requests_do_put_api_return_http_response(
+        full_api_url, post_body)
     return http_response
 
 
 # Integrations
 def snyk_integrations_import(org_id, integration_id, github_org, repo_name, manifest_files):
-    full_api_url = '%sorg/%s/integrations/%s/import' % (snyk_api_base_url, org_id, integration_id)
+    full_api_url = '%sorg/%s/integrations/%s/import' % (
+        snyk_api_base_url, org_id, integration_id)
 
     post_body = {
         'target': {
@@ -214,7 +227,8 @@ def snyk_integrations_import(org_id, integration_id, github_org, repo_name, mani
 
         post_body['files'] = files
 
-    http_response = requests_do_post_api_return_http_response(full_api_url, post_body)
+    http_response = requests_do_post_api_return_http_response(
+        full_api_url, post_body)
     return http_response
 
 
@@ -222,9 +236,10 @@ def snyk_integrations_import(org_id, integration_id, github_org, repo_name, mani
 
 # Dependencies -> List All Dependencies
 # https://snyk.docs.apiary.io/#reference/dependencies/dependencies-by-organisation
-def snyk_dependencies_list_all_dependencies_by_project(org_id, project_id, page = 1):
+def snyk_dependencies_list_all_dependencies_by_project(org_id, project_id, page=1):
     results_per_page = 50
-    full_api_url = '%sorg/%s/dependencies?sortBy=dependency&order=asc&page=%s&perPage=%s' % (snyk_api_base_url, org_id, page, results_per_page)
+    full_api_url = '%sorg/%s/dependencies?sortBy=dependency&order=asc&page=%s&perPage=%s' % (
+        snyk_api_base_url, org_id, page, results_per_page)
     print(full_api_url)
 
     post_body = {
@@ -233,12 +248,15 @@ def snyk_dependencies_list_all_dependencies_by_project(org_id, project_id, page 
         }
     }
 
-    obj_json_response_content = requests_do_post_api_return_json_object(full_api_url, post_body)
-    total = obj_json_response_content['total']  # contains the total number of results (for pagination use)
+    obj_json_response_content = requests_do_post_api_return_json_object(
+        full_api_url, post_body)
+    # contains the total number of results (for pagination use)
+    total = obj_json_response_content['total']
     results = obj_json_response_content['results']
 
     if total > (page * results_per_page):
-        next_results = snyk_dependencies_list_all_dependencies_by_project(org_id, project_id, page + 1)
+        next_results = snyk_dependencies_list_all_dependencies_by_project(
+            org_id, project_id, page + 1)
         results.extend(next_results)
         return results
     return results
@@ -248,7 +266,8 @@ def snyk_dependencies_list_all_dependencies_by_project(org_id, project_id, page 
 # List all licenses (in an org)
 # https://snyk.docs.apiary.io/#reference/licenses/licenses-by-organisation
 def snyk_licenses_list_all_licenses_by_org(org_id, project_id):
-    full_api_url = '%sorg/%s/licenses?sortBy=license&order=asc' % (snyk_api_base_url, org_id)
+    full_api_url = '%sorg/%s/licenses?sortBy=license&order=asc' % (
+        snyk_api_base_url, org_id)
 
     post_body = {
         'filters': {
@@ -258,7 +277,8 @@ def snyk_licenses_list_all_licenses_by_org(org_id, project_id):
     if project_id:
         post_body['filters']['projects'] = [project_id]
 
-    obj_json_response_content = requests_do_post_api_return_json_object(full_api_url, post_body)
+    obj_json_response_content = requests_do_post_api_return_json_object(
+        full_api_url, post_body)
     return obj_json_response_content
 
 
@@ -268,7 +288,7 @@ def snyk_licenses_list_all_licenses_by_org(org_id, project_id):
 # https://snyk.docs.apiary.io/#reference/test/maven/test-for-issues-in-a-public-package-by-group-id,-artifact-id-and-version
 def snyk_test_maven(package_group_id, package_artifact_id, version, org_id):
     full_api_url = '%stest/maven/%s/%s/%s?org=%s' % (
-    snyk_api_base_url, package_group_id, package_artifact_id, version, org_id)
+        snyk_api_base_url, package_group_id, package_artifact_id, version, org_id)
     resp = requests.get(full_api_url, headers=snyk_api_headers)
     obj_json_response_content = resp.json()
     return obj_json_response_content
@@ -277,7 +297,7 @@ def snyk_test_maven(package_group_id, package_artifact_id, version, org_id):
 # https://snyk.docs.apiary.io/#reference/test/rubygems/test-for-issues-in-a-public-gem-by-name-and-version
 def snyk_test_rubygem(gem_name, gem_version, org_id):
     full_api_url = '%stest/rubygems/%s/%s?org=%s' % (
-    snyk_api_base_url, gem_name, gem_version, org_id)
+        snyk_api_base_url, gem_name, gem_version, org_id)
     resp = requests.get(full_api_url, headers=snyk_api_headers)
     obj_json_response_content = resp.json()
     return obj_json_response_content
@@ -286,7 +306,7 @@ def snyk_test_rubygem(gem_name, gem_version, org_id):
 # https://snyk.docs.apiary.io/#reference/test/pip/test-for-issues-in-a-public-package-by-name-and-version
 def snyk_test_python_package(package_name, package_version, org_id):
     full_api_url = '%stest/pip/%s/%s?org=%s' % (
-    snyk_api_base_url, package_name, package_version, org_id)
+        snyk_api_base_url, package_name, package_version, org_id)
     resp = requests.get(full_api_url, headers=snyk_api_headers)
     obj_json_response_content = resp.json()
     return obj_json_response_content
@@ -295,7 +315,7 @@ def snyk_test_python_package(package_name, package_version, org_id):
 # https://snyk.docs.apiary.io/#reference/test/npm/test-for-issues-in-a-public-package-by-name-and-version
 def snyk_test_npm_package(package_name, package_version, org_id):
     full_api_url = '%stest/npm/%s/%s?org=%s' % (
-    snyk_api_base_url, package_name, package_version, org_id)
+        snyk_api_base_url, package_name, package_version, org_id)
     resp = requests.get(full_api_url, headers=snyk_api_headers)
     obj_json_response_content = resp.json()
     return obj_json_response_content
