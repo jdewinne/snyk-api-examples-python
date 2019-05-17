@@ -27,6 +27,7 @@ org_id = args.orgId
 
 # List projects in org
 json_res = SnykAPI.snyk_projects_projects(org_id)
+print_json(json_res)
 for proj in json_res['projects']:
     print('\nProject Name: %s' % proj['name'])
     print('  Issues Found:')
